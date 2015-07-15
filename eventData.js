@@ -546,9 +546,15 @@ var eventData = eventData || {};
             console.log('colSortSteps', colSortSteps);
             // default ordering
             var groupedEvents = this.getEventIdsByType();
+            console.log("groupedEvents", groupedEvents);
             var eventList = [];
             for (var datatype in groupedEvents) {
+                if (datatype === 'datatype label') {
+                    continue;
+                }
                 var datatypeEventList = groupedEvents[datatype];
+                datatypeEventList.unshift(datatype + "(+)");
+                datatypeEventList.push(datatype + "(-)");
                 eventList = eventList.concat(datatypeEventList);
             }
 
@@ -567,12 +573,8 @@ var eventData = eventData || {};
             var rowNames = bubbledUpEvents.slice(0);
 
             // fill in rest of the list
-            for (var r = 0; r < eventList.length; r++) {
-                var eventId = eventList[r];
-                if (! utils.isObjInArray(rowNames, eventId)) {
-                    rowNames.push(eventId);
-                }
-            }
+            rowNames = rowNames.concat(eventList);
+            rowNames = utils.eliminateDuplicates(rowNames);
 
             if (rowSortSteps != null) {
                 var steps = rowSortSteps.getSteps().reverse();
@@ -940,6 +942,7 @@ var eventData = eventData || {};
 
             for (var i = 0; i < expressionEventIds.length; i++) {
                 var eventId = expressionEventIds[i];
+                console.log("eventwiseMedianRescaling", eventId);
 
                 // get stats
                 var eventStats = this.getEvent(eventId).data.getStats();
