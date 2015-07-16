@@ -945,6 +945,9 @@ var eventData = eventData || {};
                 console.log("eventwiseMedianRescaling", eventId);
 
                 // get stats
+                console.log("get stats for", eventId);
+                var eventObj = this.getEvent(eventId);
+                console.log("eventObj", eventObj);
                 var eventStats = this.getEvent(eventId).data.getStats();
                 stats[eventId] = {};
                 stats[eventId] = eventStats;
@@ -1415,6 +1418,10 @@ var eventData = eventData || {};
             };
 
             results.percentNullData = this.getPercentNullData();
+            results.percentNullData = results.percentNullData.toPrecision(precision);
+            if (results.percentNullData == 1) {
+                return results;
+            }
 
             // a mapping of sampleId to index
             var allSampleIds = this.getAllSampleIds(true);
@@ -1442,6 +1449,7 @@ var eventData = eventData || {};
                     }
                 }
             }
+
             results['mean'] = jStat.mean(vector).toPrecision(precision);
             results['sd'] = jStat.stdev(vector).toPrecision(precision);
             results['median'] = jStat.median(vector).toPrecision(precision);
@@ -1449,7 +1457,6 @@ var eventData = eventData || {};
             results['meandev'] = jStat.meandev(vector).toPrecision(precision);
             results['min'] = jStat.min(vector).toPrecision(precision);
             results['max'] = jStat.max(vector).toPrecision(precision);
-            results['percentNullData'] = results['percentNullData'].toPrecision(precision);
 
             return results;
         };
