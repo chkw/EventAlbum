@@ -944,12 +944,9 @@ var eventData = eventData || {};
 
             for (var i = 0; i < expressionEventIds.length; i++) {
                 var eventId = expressionEventIds[i];
-                console.log("eventwiseMedianRescaling", eventId);
 
                 // get stats
-                console.log("get stats for", eventId);
                 var eventObj = this.getEvent(eventId);
-                console.log("eventObj", eventObj);
                 var eventStats = this.getEvent(eventId).data.getStats();
                 stats[eventId] = {};
                 stats[eventId] = eventStats;
