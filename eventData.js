@@ -668,11 +668,12 @@ var eventData = eventData || {};
          * If sortingSteps is null, then just return the sampleIds without sorting.
          */
         this.multisortSamples = function(sortingSteps) {
-            console.log("multisortSamples using steps:", sortingSteps.getSteps());
             var sampleIds = this.getAllSampleIds();
             if (sortingSteps == null) {
+                console.log("multisortSamples got null steps");
                 return sampleIds;
             }
+            console.log("multisortSamples using steps:", sortingSteps.getSteps());
             var steps = sortingSteps.getSteps().slice();
             steps.reverse();
 
