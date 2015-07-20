@@ -223,6 +223,9 @@ var eventData = eventData || {};
          */
         this.getEvent = function(eventId) {
             var e = this.album[eventId];
+            if ( typeof e === "undefined") {
+                console.log("getEvent got undefined eventObj for: " + eventId);
+            }
             return e;
         };
 
