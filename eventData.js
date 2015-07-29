@@ -1080,6 +1080,36 @@ var eventData = eventData || {};
         };
 
         /**
+         * remove events that have no sample data
+         */
+        this.removeEmptyEvents = function(maxPercentNull) {
+            var threshold = maxPercentNull || 0.99;
+            var allEventIdsByCategory = this.getEventIdsByType();
+            var emptyEvents = [];
+            var categories = utils.getKeys(allEventIdsByCategory);
+            for (var i = 0, length = categories.length; i < length; i++) {
+                var category = categories[i];
+                if (category === "datatype label") {
+                    continue;
+                }
+                for (var j = 0; j < allEventIdsByCategory[category].length; j++) {
+                    var eventId = allEventIdsByCategory[category][j];
+                    var eventObj = this.getEvent(eventId);
+                    var percentNull = eventObj.data.getPercentNullData();
+                    if (percentNull >= threshold) {
+                        emptyEvents.push(eventId);
+                    }
+                }
+            }
+            for (var i = 0, length = emptyEvents.length; i < length; i++) {
+                var eventId = emptyEvents[i];
+                console.log("empty event:", eventId);
+                this.deleteEvent(eventId);
+            }
+            return null;
+        };
+
+        /**
          * Fill in missing samples data with the specified value.
          */
         this.fillInMissingSamples = function(value) {
