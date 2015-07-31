@@ -315,6 +315,44 @@ var medbookDataLoader = medbookDataLoader || {};
         }
     };
 
+    mdl.mongoMutationData = function(collection, OD_eventAlbum) {
+        // iter over doc ... each doc is a mutation call
+        var mutByGene = {};
+        for (var i = 0, length = collection.length; i < length; i++) {
+            var doc = collection[i];
+
+            var variantCallData = {};
+
+            var sample = variantCallData["sample"] = doc["sample"];
+            var gene = variantCallData["gene"] = doc["Hugo_Symbol"];
+            variantCallData["mutType"] = doc["Variant_Classification"];
+            variantCallData["MA_FImpact"] = doc["MA_FImpact"];
+            variantCallData["MA_FIS"] = doc["MA_FIS"];
+            variantCallData["proteinChange"] = doc["MA_protein_change"];
+
+            if (! utils.hasOwnProperty(mutByGene, gene)) {
+                mutByGene[gene] = {};
+            }
+
+            if (! utils.hasOwnProperty(mutByGene[gene], sample)) {
+                mutByGene[gene][sample] = 0;
+            }
+
+            mutByGene[gene][sample] = mutByGene[gene][sample] + 1;
+        }
+
+        // add to event album
+        var genes = utils.getKeys(mutByGene);
+        var suffix = "_mutation";
+        for (var i = 0, length = genes.length; i < length; i++) {
+            var gene = genes[i];
+            var sampleData = mutByGene[gene];
+            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', 'numeric', sampleData);
+        }
+
+        return null;
+    };
+
     /**
      *Add expression data from mongo collection.
      * @param {Object} collection
