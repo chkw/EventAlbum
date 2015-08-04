@@ -1182,6 +1182,32 @@ var eventData = eventData || {};
 
             this.fillInMissingSamples(value);
         };
+
+        this.getDatatypeNullSamples = function(datatype) {
+            var samplesToHide = [];
+            try {
+                // get eventobjs in datatype
+                var eventIdsByType = this.getEventIdsByType();
+                var eventTypes = utils.getKeys(eventIdsByType);
+                if (utils.isObjInArray(eventTypes, datatype)) {
+                    // find samples that are null in all events of the datatype
+                    samplesToHide = this.getAllSampleIds();
+                    var eventIds = eventIdsByType[datatype];
+                    for (var i = 0, length = eventIds.length; i < length; i++) {
+                        var eventId = eventIds[i];
+                        var eventObj = this.getEvent(eventId);
+                        var nullSamples = eventObj.data.getNullSamples();
+                        samplesToHide = samplesToHide.concat(nullSamples);
+                        samplesToHide = utils.keepReplicates(samplesToHide);
+                    }
+                }
+            } catch (error) {
+                console.log('ERROR while getting samples to hide in datatype:', datatype, 'error.message ->', error.message);
+            } finally {
+                console.log('samplesToHide', samplesToHide);
+                return samplesToHide;
+            }
+        };
     };
 
     ed.OD_event = function(metadataObj) {
