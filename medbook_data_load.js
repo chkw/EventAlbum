@@ -268,6 +268,44 @@ var medbookDataLoader = medbookDataLoader || {};
     };
 
     /**
+     *
+     */
+    mdl.mongoViperSignaturesData = function(collection, OD_eventAlbum) {
+        // iter over doc (each doc = signature)
+        for (var i = 0, length = collection.length; i < length; i++) {
+            var doc = collection[i];
+            var type = doc["type"];
+            var algorithm = doc["algorithm"];
+            var label = doc["label"];
+            var gene_label = doc["gene_label"];
+            var sample_values = doc["sample_values"];
+
+            var sampleData = {};
+            for (var j = 0, lengthj = sample_values.length; j < lengthj; j++) {
+                var sampleValue = sample_values[j];
+                var patient_label = sampleValue["patient_label"];
+                var sample_label = sampleValue["sample_label"];
+                var value = sampleValue["value"];
+
+                sampleData[sample_label] = value;
+            }
+
+            // TODO version number ??
+            var datatype = type + "_" + algorithm;
+            var suffix = "_" + datatype;
+            var eventId = gene_label + suffix;
+            var eventObj = OD_eventAlbum.getEvent(eventId);
+
+            // add event if DNE
+            if (eventObj == null) {
+                eventObj = mdl.loadEventBySampleData(OD_eventAlbum, gene_label, "_viper", 'viper data', 'numeric', sampleData);
+                } else {
+                eventObj.data.setData(sampleData);
+            }
+        }
+    };
+
+    /**
      *Add expression data from mongo collection.
      * @param {Object} collection
      * @param {Object} OD_eventAlbum

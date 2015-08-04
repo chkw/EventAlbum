@@ -689,6 +689,9 @@ var eventData = eventData || {};
                 for (var i = 0; i < steps.length; i++) {
                     // get this step's values
                     var eventId = steps[i]['name'];
+                    if ( typeof eventId === "undefined") {
+                        continue;
+                    }
                     var reverse = steps[i]['reverse'];
                     var eventObj = album.getEvent(eventId);
                     if ((eventObj == undefined) || (eventObj == null)) {
@@ -1506,6 +1509,10 @@ var eventData = eventData || {};
                         vector.push(val);
                     }
                 }
+            }
+
+            if (vector.length == 0) {
+                return results;
             }
 
             results['mean'] = jStat.mean(vector).toPrecision(precision);
