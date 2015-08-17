@@ -299,7 +299,7 @@ var medbookDataLoader = medbookDataLoader || {};
             // add event if DNE
             if (eventObj == null) {
                 eventObj = mdl.loadEventBySampleData(OD_eventAlbum, gene_label, "_viper", 'viper data', 'numeric', sampleData);
-                } else {
+            } else {
                 eventObj.data.setData(sampleData);
             }
         }
@@ -675,6 +675,11 @@ var medbookDataLoader = medbookDataLoader || {};
                     // no suffix here, just the gene symbol
                     // newName = name + "_mRNA";
                     newName = name;
+                } else {
+                    newName = name;
+                }
+                if ( typeof newName === "undefined") {
+                    console.log("undefined name for", name, datatype, version);
                 }
                 return newName;
             };

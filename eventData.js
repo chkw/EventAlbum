@@ -384,18 +384,6 @@ var eventData = eventData || {};
                     orderedEvents = utils.eliminateDuplicates(orderedEvents);
                 }
 
-                // if ((keepTails) && (utils.isObjInArray(pivotedDatatypes, datatype))) {
-                // console.log('keepTails for', datatype);
-                // var size = 10;
-                // if (orderedEvents.length <= size) {
-                // // skip filter
-                // } else {
-                // // TODO filter for head and tail of list
-                // var head = orderedEvents.splice(0, size * 0.5);
-                // var tail = orderedEvents.splice(size * -0.5);
-                // orderedEvents = head.concat(tail);
-                // }
-                // }
                 result[datatype] = orderedEvents;
             }
             return result;
