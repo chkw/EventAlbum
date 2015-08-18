@@ -305,6 +305,7 @@ var eventData = eventData || {};
 
                 var key;
                 var val = score;
+                pEventId = pEventId.replace(/_mRNA$/, "");
                 if (eventId1 === pEventId) {
                     key = eventId2;
                 } else if (eventId2 === pEventId) {
@@ -332,14 +333,13 @@ var eventData = eventData || {};
 
         /**
          * Get pivot sorted events organized by datatype.
-         * If keepTails == true, then only keep top and bottom ranking events.
          */
-        this.getGroupedPivotSorts = function(pEventId, keepTails) {
+        this.getGroupedPivotSorts = function(pEventId) {
             console.log('getGroupedPivotSorts');
-            var pivotedDatatypes = ['expression data', 'expression signature'];
             var result = {};
 
             // Extract the gene symbols. They are without suffix.
+            pEventId = pEventId.replace(/_mRNA$/, "");
             var pivotSortedEventObjs = this.getPivotSortedEvents(pEventId);
             // console.log("pivotSortedEventObjs", utils.prettyJson(pivotSortedEventObjs));
             var pivotSortedEvents = [];
@@ -350,7 +350,7 @@ var eventData = eventData || {};
 
             // iterate through datatypes
             var groupedEvents = this.getEventIdsByType();
-            pivotedDatatypes = utils.getKeys(groupedEvents);
+            var pivotedDatatypes = utils.getKeys(groupedEvents);
             pivotedDatatypes = utils.removeA(pivotedDatatypes, "clinical data");
 
             for (var datatype in groupedEvents) {
