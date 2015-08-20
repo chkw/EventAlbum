@@ -354,11 +354,6 @@ var eventData = eventData || {};
             pivotedDatatypes = utils.removeA(pivotedDatatypes, "clinical data");
 
             for (var datatype in groupedEvents) {
-                // pivot sort events within datatype
-
-                // var suffix = this.datatypeSuffixMapping[datatype];
-                // suffix = (suffix == null) ? "" : suffix;
-
                 var orderedEvents = [];
 
                 // suffixed ids here
@@ -371,18 +366,17 @@ var eventData = eventData || {};
 
                 // add scored events in the datatype
                 for (var i = 0; i < pivotSortedEvents.length; i++) {
-                    // var eventId = pivotSortedEvents[i] + suffix;
                     var eventId = this.getSuffixedEventId(pivotSortedEvents[i], datatype);
                     if (utils.isObjInArray(unorderedEvents, eventId)) {
                         orderedEvents.push(eventId);
                     }
                 }
 
-                if (! utils.isObjInArray(pivotedDatatypes, datatype)) {
-                    // add the unscored events from the datatype group
-                    orderedEvents = orderedEvents.concat(unorderedEvents);
-                    orderedEvents = utils.eliminateDuplicates(orderedEvents);
-                }
+                // add the unscored events from the datatype group
+                // if (! utils.isObjInArray(pivotedDatatypes, datatype)) {
+                orderedEvents = orderedEvents.concat(unorderedEvents);
+                orderedEvents = utils.eliminateDuplicates(orderedEvents);
+                // }
 
                 result[datatype] = orderedEvents;
             }
