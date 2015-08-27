@@ -361,12 +361,10 @@ var medbookDataLoader = medbookDataLoader || {};
 
             var variantCallData = {};
 
-            var sample = variantCallData["sample"] = doc["sample"];
-            var gene = variantCallData["gene"] = doc["Hugo_Symbol"];
-            variantCallData["mutType"] = doc["Variant_Classification"];
-            variantCallData["MA_FImpact"] = doc["MA_FImpact"];
-            variantCallData["MA_FIS"] = doc["MA_FIS"];
-            variantCallData["proteinChange"] = doc["MA_protein_change"];
+            var sample = variantCallData["sample"] = doc["sample_label"];
+            var gene = variantCallData["gene"] = doc["gene_label"];
+            variantCallData["mutType"] = doc["mutation_type"];
+            variantCallData["impact"] = doc["effect_impact"];
 
             if (! utils.hasOwnProperty(mutByGene, gene)) {
                 mutByGene[gene] = {};
