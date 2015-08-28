@@ -355,6 +355,7 @@ var medbookDataLoader = medbookDataLoader || {};
 
     mdl.mongoMutationData = function(collection, OD_eventAlbum) {
         // iter over doc ... each doc is a mutation call
+        var impactScoresMap = OD_eventAlbum.mutationImpactScoresMap;
         var mutByGene = {};
         for (var i = 0, length = collection.length; i < length; i++) {
             var doc = collection[i];
@@ -364,17 +365,30 @@ var medbookDataLoader = medbookDataLoader || {};
             var sample = variantCallData["sample"] = doc["sample_label"];
             var gene = variantCallData["gene"] = doc["gene_label"];
             variantCallData["mutType"] = doc["mutation_type"];
-            variantCallData["impact"] = doc["effect_impact"];
+            var impact = variantCallData["impact"] = doc["effect_impact"];
 
             if (! utils.hasOwnProperty(mutByGene, gene)) {
                 mutByGene[gene] = {};
             }
 
+            // TODO score by greatest impact
             if (! utils.hasOwnProperty(mutByGene[gene], sample)) {
-                mutByGene[gene][sample] = 0;
+                mutByGene[gene][sample] = impact;
+            } else {
+                var recordedImpact = mutByGene[gene][sample];
+                if (impactScoresMap[impact] > impactScoresMap[recordedImpact]) {
+                    mutByGene[gene][sample] = impact;
+                } else {
+                    continue;
+                }
             }
 
-            mutByGene[gene][sample] = mutByGene[gene][sample] + 1;
+            // mutation counts
+            // if (! utils.hasOwnProperty(mutByGene[gene], sample)) {
+            // mutByGene[gene][sample] = 0;
+            // }
+            //
+            // mutByGene[gene][sample] = mutByGene[gene][sample] + 1;
         }
 
         // add to event album
@@ -383,7 +397,7 @@ var medbookDataLoader = medbookDataLoader || {};
         for (var i = 0, length = genes.length; i < length; i++) {
             var gene = genes[i];
             var sampleData = mutByGene[gene];
-            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', 'numeric', sampleData);
+            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', 'mutation impact', sampleData);
         }
 
         return null;

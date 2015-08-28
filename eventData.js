@@ -82,6 +82,13 @@ var eventData = eventData || {};
         // // convert JS obj to jQ obj
         // $xml = $(xmlDoc);
 
+        this.mutationImpactScoresMap = {
+            "MIN" : -1,
+            "MODIFIER" : -0.3,
+            "MODERATE" : 1,
+            "HIGH" : 2
+        };
+
         this.album = {};
 
         /**
