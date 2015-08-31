@@ -355,7 +355,9 @@ var medbookDataLoader = medbookDataLoader || {};
 
     mdl.mongoMutationData = function(collection, OD_eventAlbum) {
         // iter over doc ... each doc is a mutation call
-        var impactScoresMap = OD_eventAlbum.mutationImpactScoresMap;
+        var allowed_values = "mutation impact";
+
+        var impactScoresMap = OD_eventAlbum.ordinalScoring[allowed_values];
         var mutByGene = {};
         for (var i = 0, length = collection.length; i < length; i++) {
             var doc = collection[i];
@@ -397,7 +399,7 @@ var medbookDataLoader = medbookDataLoader || {};
         for (var i = 0, length = genes.length; i < length; i++) {
             var gene = genes[i];
             var sampleData = mutByGene[gene];
-            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', 'mutation impact', sampleData);
+            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', allowed_values, sampleData);
         }
 
         return null;
