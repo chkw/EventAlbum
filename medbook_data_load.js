@@ -353,7 +353,58 @@ var medbookDataLoader = medbookDataLoader || {};
         }
     };
 
+    /**
+     * data about mutation type
+     */
     mdl.mongoMutationData = function(collection, OD_eventAlbum) {
+        // iter over doc ... each doc is a mutation call
+        var allowed_values = "mutation type";
+
+        var impactScoresMap = OD_eventAlbum.ordinalScoring[allowed_values];
+
+        var mutByGene = {};
+        // for (var i = 0, length = collection.length; i < length; i++) {
+        _.each(collection, function(element) {
+            var doc = element;
+
+            var variantCallData = {};
+
+            var sample = doc["sample_label"];
+            var gene = doc["gene_label"];
+            var type = variantCallData["mutType"] = doc["mutation_type"];
+            // var impact = variantCallData["impact"] = doc["effect_impact"];
+
+            if (! utils.hasOwnProperty(mutByGene, gene)) {
+                mutByGene[gene] = {};
+            }
+
+            if (! utils.hasOwnProperty(mutByGene[gene], sample)) {
+                mutByGene[gene][sample] = [];
+            }
+
+            var findResult = _.findWhere(mutByGene[gene][sample], type);
+            if (_.isUndefined(findResult)) {
+                mutByGene[gene][sample].push(type);
+            }
+        });
+        console.log("mutByGene", mutByGene);
+
+        // add to event album
+        var genes = utils.getKeys(mutByGene);
+        var suffix = "_mutation";
+        for (var i = 0, length = genes.length; i < length; i++) {
+            var gene = genes[i];
+            var sampleData = mutByGene[gene];
+            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', allowed_values, sampleData);
+        }
+
+        return null;
+    };
+
+    /**
+     * Data about mutation impact
+     */
+    mdl.mongoMutationData_impact = function(collection, OD_eventAlbum) {
         // iter over doc ... each doc is a mutation call
         var allowed_values = "mutation impact";
 
@@ -362,12 +413,10 @@ var medbookDataLoader = medbookDataLoader || {};
         for (var i = 0, length = collection.length; i < length; i++) {
             var doc = collection[i];
 
-            var variantCallData = {};
-
-            var sample = variantCallData["sample"] = doc["sample_label"];
-            var gene = variantCallData["gene"] = doc["gene_label"];
-            variantCallData["mutType"] = doc["mutation_type"];
-            var impact = variantCallData["impact"] = doc["effect_impact"];
+            var sample = doc["sample_label"];
+            var gene = doc["gene_label"];
+            var type = doc["mutation_type"];
+            var impact = doc["effect_impact"];
 
             if (! utils.hasOwnProperty(mutByGene, gene)) {
                 mutByGene[gene] = {};
@@ -384,13 +433,6 @@ var medbookDataLoader = medbookDataLoader || {};
                     continue;
                 }
             }
-
-            // mutation counts
-            // if (! utils.hasOwnProperty(mutByGene[gene], sample)) {
-            // mutByGene[gene][sample] = 0;
-            // }
-            //
-            // mutByGene[gene][sample] = mutByGene[gene][sample] + 1;
         }
 
         // add to event album
