@@ -727,8 +727,7 @@ var eventData = eventData || {};
         /**
          * for checking if some samples have differential expression
          */
-        this.eventwiseMedianRescaling = function() {
-            // TODO
+        this.eventwiseMedianRescaling_old = function() {
             console.log('eventwiseMedianRescaling');
 
             // get expression events
@@ -778,6 +777,66 @@ var eventData = eventData || {};
             result['minVal'] = jStat.min(allAdjustedVals);
 
             return result;
+        };
+
+        this.eventwiseMedianRescaling_events = function(eventIds) {
+            // compute average val each gene
+            var stats = {};
+            var result = {
+                'stats' : stats
+            };
+
+            var allAdjustedVals = [];
+
+            _.each(eventIds, function(eventId) {
+                // get stats
+                var eventObj = this.getEvent(eventId);
+                var eventStats = this.getEvent(eventId).data.getStats();
+                stats[eventId] = {};
+                stats[eventId] = eventStats;
+
+                // finally iter over all samples to adjust score
+                var allEventData = this.getEvent(eventId).data.getData();
+
+                _.each(allEventData, function(data) {
+                    if (utils.hasOwnProperty(data, 'val_orig')) {
+                        data['val'] = data['val_orig'];
+                    }
+                    var val = data['val'];
+                    data['val_orig'] = val;
+                    if (utils.isNumerical(val)) {
+                        var newVal = (val - stats[eventId]['median']);
+                        data['val'] = newVal;
+                        allAdjustedVals.push(data['val']);
+                    }
+                });
+            }, this);
+
+            // find min/max of entire matrix
+            result['maxVal'] = jStat.max(allAdjustedVals);
+            result['minVal'] = jStat.min(allAdjustedVals);
+
+            return result;
+        };
+
+        /**
+         * for checking if some samples have differential expression
+         */
+        this.eventwiseMedianRescaling = function(datatypesToRescale) {
+            console.log('eventwiseMedianRescaling');
+            // get expression events
+            var allEventIds = this.getEventIdsByType();
+            var datatypesToRescale = datatypesToRescale || _.keys(allEventIds);
+            var result = {};
+            _.each(datatypesToRescale, function(eventType) {
+                console.log("eventType", eventType);
+                var eventIds = allEventIds[eventType];
+                if (this.getEvent(eventIds[0]).metadata.allowedValues === "numeric") {
+                    var datatypeResult = this.eventwiseMedianRescaling_events(eventIds);
+                    result[eventType] = datatypeResult;
+                }
+            }, this);
+            return result["expression data"];
         };
 
         /**
