@@ -182,7 +182,7 @@ var medbookDataLoader = medbookDataLoader || {};
     };
 
     /**
-     *
+     * where the event is a gene
      */
     mdl.getGeneBySampleData = function(url, OD_eventAlbum, geneSuffix, datatype, allowedValues) {
         var response = utils.getResponse(url);
@@ -265,6 +265,24 @@ var medbookDataLoader = medbookDataLoader || {};
             }
         }
         return eventObj;
+    };
+
+    /**
+     * Load a matrix of signature data from a string.
+     */
+    mdl.genericMatrixData = function(matrixString, dataName, OD_eventAlbum) {
+        var parsedMatrix = d3.tsv.parse(matrixString);
+        var allowedValues = "numeric";
+        var sanitizedDataName = dataName.replace(/ /, "_");
+
+        _.each(parsedMatrix, function(row) {
+            var colNames = _.keys(row);
+            var featureKey = colNames.shift();
+            var feature = row[featureKey];
+            delete row[featureKey];
+
+            mdl.loadEventBySampleData(OD_eventAlbum, feature, "_" + sanitizedDataName, dataName, allowedValues, row);
+        });
     };
 
     /**
