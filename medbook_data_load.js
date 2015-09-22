@@ -270,10 +270,12 @@ var medbookDataLoader = medbookDataLoader || {};
     /**
      * Load a matrix of signature data from a string.
      */
-    mdl.genericMatrixData = function(matrixString, dataName, OD_eventAlbum) {
+    mdl.genericMatrixData = function(matrixString, dataName, OD_eventAlbum, allowedValues) {
         var parsedMatrix = d3.tsv.parse(matrixString);
-        var allowedValues = "numeric";
+        // var allowedValues = "numeric";
         var sanitizedDataName = dataName.replace(/ /, "_");
+
+        var returnFeatures = [];
 
         _.each(parsedMatrix, function(row) {
             var colNames = _.keys(row);
@@ -281,8 +283,16 @@ var medbookDataLoader = medbookDataLoader || {};
             var feature = row[featureKey];
             delete row[featureKey];
 
-            mdl.loadEventBySampleData(OD_eventAlbum, feature, "_" + sanitizedDataName, dataName, allowedValues, row);
+            if (dataName === "clinical data") {
+                mdl.loadEventBySampleData(OD_eventAlbum, feature, "", "clinical data", "categoric", row);
+                returnFeatures.push(feature);
+            } else {
+                mdl.loadEventBySampleData(OD_eventAlbum, feature, "_" + sanitizedDataName, dataName, allowedValues, row);
+                returnFeatures = [dataName];
+            }
+            // mdl.loadEventBySampleData(OD_eventAlbum, feature, "_viper", "viper data", allowedValues, row);
         });
+        return returnFeatures;
     };
 
     /**
