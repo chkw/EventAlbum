@@ -306,12 +306,21 @@ var medbookDataLoader = medbookDataLoader || {};
             var algorithm = doc["algorithm"];
             var label = doc["label"];
             var gene_label = doc["gene_label"];
-            var sample_values = doc["sample_values"];
+
+            var sample_values;
+            if (_.contains(doc, "sample_values")) {
+                sample_values = doc["sample_values"];
+            } else if (_.contains(doc, "samples")) {
+                sample_values = doc["samples"];
+            } else {
+                console.log("no sample data found", type, algorithm, gene_label);
+                continue;
+            }
 
             var sampleData = {};
             for (var j = 0, lengthj = sample_values.length; j < lengthj; j++) {
                 var sampleValue = sample_values[j];
-                var patient_label = sampleValue["patient_label"];
+                // var patient_label = sampleValue["patient_label"];
                 var sample_label = sampleValue["sample_label"];
                 var value = sampleValue["value"];
 
