@@ -519,13 +519,13 @@ var eventData = eventData || {};
                     if (allowedValues == 'numeric') {
                         comparator = utils.compareAsNumeric;
                     } else if (allowedValues == 'categoric') {
-                        comparator = utils.compareAsString;
+                        comparator = utils.compareAsString_medbook;
                     } else if (allowedValues == 'expression') {
                         comparator = utils.compareAsNumeric;
                     } else if (allowedValues == 'date') {
                         comparator = utils.compareAsDate;
                     } else {
-                        comparator = utils.compareAsString;
+                        comparator = utils.compareAsString_medbook;
                     }
 
                     // compare this step's values
@@ -1274,6 +1274,7 @@ var eventData = eventData || {};
         /**
          * compare sample scores and return sorted list of sample IDs. If sortType == numeric, then numeric sort.  Else, sort as strings.
          */
+        // TODO dead code?
         this.sortSamples = function(sampleIdList, sortType) {
             // sortingData has to be an array
             var sortingData = this.getData(sampleIdList);
