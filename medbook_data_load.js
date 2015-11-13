@@ -596,8 +596,13 @@ var medbookDataLoader = medbookDataLoader || {};
             var rootName = fields.join('_v');
             if (utils.endsWith(rootName, '_kinase_viper')) {
                 datatype = 'kinase target activity';
+                eventId = rootName.replace(/_kinase_viper/,"");
             } else if (utils.endsWith(rootName, '_tf_viper') || utils.beginsWith(rootName, 'tf_viper_')) {
                 datatype = 'tf target activity';
+                eventId = rootName.replace(/_tf_viper/,"");
+            } else if (utils.endsWith(rootName, '_mvl_drug_sensitivity') || utils.beginsWith(rootName, 'mvl_drug_sensitivity_')) {
+                datatype = 'mvl drug sensitivity';
+                eventId = rootName.replace(/_mvl_drug_sensitivity/,"");
             } else {
                 datatype = 'expression signature';
             }
@@ -625,6 +630,8 @@ var medbookDataLoader = medbookDataLoader || {};
             datatype = 'kinase target activity';
         } else if (utils.endsWith(obj['name'], '_tf_viper') || utils.beginsWith(obj['name'], 'tf_viper_')) {
             datatype = 'tf target activity';
+        } else if (utils.endsWith(obj['name'], '_mvl_drug_sensitivity') || utils.beginsWith(obj['name'], 'mvl_drug_sensitivity_')) {
+            datatype = 'mvl drug sensitivity';
         } else {
             datatype = "expression signature";
         }
