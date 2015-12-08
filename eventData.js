@@ -994,7 +994,11 @@ var eventData = eventData || {};
                     var missingData = {};
                     for (var k = 0; k < missingSampleIds.length; k++) {
                         var id = missingSampleIds[k];
-                        missingData[id] = value;
+                        if (eventId === "patientSamples"){
+                          missingData[id] = "other patient";
+                        } else {
+                          missingData[id] = value;
+                        }
                     }
                     // add data
                     this.getEvent(eventId).data.setData(missingData);
