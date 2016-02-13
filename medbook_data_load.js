@@ -212,6 +212,55 @@ var medbookDataLoader = medbookDataLoader || {};
     };
 
     /**
+     * gaData looks like this:
+     {
+     "_id": {
+     "_str": "56bd09c433cbfe5c8a00ae49"
+     },
+     "collaborations": [
+     "WCDT"
+     ],
+     "gene_label": "MDM4",
+     "sample_label": "DTB-005",
+     "study_label": "prad_wcdt",
+     "gistic_copy_number": 0.23
+     }
+     */
+    mdl.mongoGeneAnnotationData = function(gaData, OD_eventAlbum) {
+        _.each(gaData, function(data) {
+            // remove unused fields
+            delete data["_id"];
+            delete data["collaborations"];
+            delete data["study_label"];
+
+            var gene = data["gene_label"];
+            delete data["gene_label"];
+
+            var sample = data["sample_label"];
+            delete data["sample_label"];
+
+            // remaining keys should be datatypes
+            _.each(_.keys(data), function(datatype) {
+                var value = data[datatype];
+
+                // get eventObj
+                var suffix = "_" + datatype;
+                var eventId = gene + suffix;
+                var eventObj = OD_eventAlbum.getEvent(eventId);
+                // create event if DNE
+                if (eventObj == null) {
+                    eventObj = mdl.loadEventBySampleData(OD_eventAlbum, eventId, "", datatype, 'numeric', []);
+                }
+
+                // add data to eventObj
+                var dataObj = {};
+                dataObj[sample] = value;
+                eventObj.data.setData(dataObj);
+            });
+        });
+    };
+
+    /**
      * A contrast is one row of clinical data.
      */
     mdl.mongoContrastData = function(contrastData, OD_eventAlbum) {
