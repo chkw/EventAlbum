@@ -250,6 +250,7 @@ var medbookDataLoader = medbookDataLoader || {};
                 // create event if DNE
                 if (eventObj == null) {
                     eventObj = mdl.loadEventBySampleData(OD_eventAlbum, eventId, "", datatype, 'numeric', []);
+                    eventObj.metadata.displayName = gene;
                 }
 
                 // add data to eventObj
