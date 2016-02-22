@@ -508,17 +508,102 @@ var medbookDataLoader = medbookDataLoader || {};
 
         var impactScoresMap = OD_eventAlbum.ordinalScoring[allowed_values];
 
+        var mutTypeByGene = {};
+        var impactScoreByGene = {};
+        // for (var i = 0, length = collection.length; i < length; i++) {
+        _.each(collection, function(element) {
+            var doc = element;
+
+            var sample = doc["sample_label"];
+            var gene = doc["gene_label"];
+            var type = doc["mutation_type"];
+            var sequenceOntology = doc["sequence_ontology"];
+            // from http://www.cravat.us/help.jsp?chapter=help_user_account&article=top#sequence_ontology
+            // SY	Synonymous Variant
+            // SL	Stop Lost
+            // SG	Stop Gained
+            // MS	Missense Variant
+            // II	Inframe Insertion
+            // FI	Frameshift Insertion
+            // ID	Inframe Deletion
+            // FD	Frameshift Deletion
+            // CS	Complex Substitution
+
+            // handle mutation type
+            if (! _.isUndefined(type)) {
+                type = type.toLowerCase();
+                if (! utils.hasOwnProperty(mutTypeByGene, gene)) {
+                    mutTypeByGene[gene] = {};
+                }
+
+                if (! utils.hasOwnProperty(mutTypeByGene[gene], sample)) {
+                    mutTypeByGene[gene][sample] = [];
+                }
+
+                var findResult = _.findWhere(mutTypeByGene[gene][sample], type);
+                if (_.isUndefined(findResult)) {
+                    mutTypeByGene[gene][sample].push(type);
+                }
+            }
+            // handle impact score
+            var impact_assessor = (_.contains(_.keys(doc), "mutation_impact_assessor")) ? doc["mutation_impact_assessor"] : null;
+            if (!_.isNull(impact_assessor) && impact_assessor.toLowerCase() === "chasm") {
+                var chasmScore = doc["chasm_driver_score"];
+
+                if (_.isUndefined(impactScoreByGene[gene])) {
+                    impactScoreByGene[gene] = {};
+                }
+
+                if (_.isUndefined(impactScoreByGene[gene][sample])) {
+                    impactScoreByGene[gene][sample] = 1;
+                }
+
+                if (impactScoreByGene[gene][sample] > chasmScore) {
+                    impactScoreByGene[gene][sample] = chasmScore;
+                }
+            } else {
+                console.log("NO CHASM for", sample, gene);
+            }
+        });
+        console.log("mutTypeByGene", mutTypeByGene);
+        console.log("impactScoreByGene", impactScoreByGene);
+
+        // mutation type - add to event album
+        var suffix = "_mutation";
+        _.each(_.keys(mutTypeByGene), function(gene) {
+            var sampleData = mutTypeByGene[gene];
+            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation call', allowed_values, sampleData);
+        });
+
+        // mutation impact
+        suffix = "_mutation_impact_score";
+        allowed_values = "chasm";
+        _.each(_.keys(impactScoreByGene), function(gene) {
+            var sampleData = impactScoreByGene[gene];
+            mdl.loadEventBySampleData(OD_eventAlbum, gene, suffix, 'mutation impact score', allowed_values, sampleData);
+        });
+
+        return null;
+    };
+
+    /**
+     * data about mutation type
+     */
+    mdl.mongoMutationData_old = function(collection, OD_eventAlbum) {
+        // iter over doc ... each doc is a mutation call
+        var allowed_values = "mutation type";
+
+        var impactScoresMap = OD_eventAlbum.ordinalScoring[allowed_values];
+
         var mutByGene = {};
         // for (var i = 0, length = collection.length; i < length; i++) {
         _.each(collection, function(element) {
             var doc = element;
 
-            var variantCallData = {};
-
             var sample = doc["sample_label"];
             var gene = doc["gene_label"];
-            var type = variantCallData["mutType"] = doc["mutation_type"];
-            // var impact = variantCallData["impact"] = doc["effect_impact"];
+            var type = doc["mutation_type"];
+            var impact_assessor = (_.contains(_.keys(doc), "mutation_impact_assessor")) ? doc["mutation_impact_assessor"] : null;
 
             if (! utils.hasOwnProperty(mutByGene, gene)) {
                 mutByGene[gene] = {};
