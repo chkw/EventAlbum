@@ -232,8 +232,7 @@ var eventData = eventData || {};
             }
             var sortedEvents = [];
             var recordedEvents = {};
-            for (var i = 0, length = this.pivot.scores.length; i < length; i++) {
-                var scoreObj = this.pivot.scores[i];
+            _.each(this.pivot.scores, function(scoreObj) {
                 var eventId1 = scoreObj['eventId1'];
                 var eventId2 = scoreObj['eventId2'];
                 var score = scoreObj['score'];
@@ -247,12 +246,12 @@ var eventData = eventData || {};
                     key = eventId1;
                 } else {
                     // filter by pEventId
-                    continue;
+                    return;
                 }
 
                 if (utils.hasOwnProperty(recordedEvents, key)) {
                     // duplicate event
-                    continue;
+                    return;
                 }
 
                 sortedEvents.push({
@@ -261,7 +260,7 @@ var eventData = eventData || {};
                 });
 
                 recordedEvents[key] = 1;
-            }
+            });
             sortedEvents = sortedEvents.sort(utils.sort_by('val'));
             return sortedEvents;
         };
@@ -276,8 +275,8 @@ var eventData = eventData || {};
             // Extract the gene symbols. They are without suffix.
             pEventId = pEventId.replace(/_mRNA$/, "");
             var pivotSortedEventObjs = this.getPivotSortedEvents(pEventId);
-            var pivotSortedEvents = [];
 
+            var pivotSortedEvents = [];
             _.each(pivotSortedEventObjs, function(pivotSortedEventObj) {
                 pivotSortedEvents.push(pivotSortedEventObj['key']);
             });
@@ -286,11 +285,14 @@ var eventData = eventData || {};
             var groupedEvents = this.getEventIdsByType();
             var orderedDatatypes = getOrderedDatatypes(_.keys(groupedEvents));
 
+            // preferred order of submatrices
             _.each(orderedDatatypes, function(datatype) {
                 var orderedEvents = [];
 
                 // suffixed ids here
                 var unorderedEvents = groupedEvents[datatype];
+
+                // no pivot sorted events available
                 if (pivotSortedEvents.length == 0) {
                     console.log('pivotSortedEvents.length == 0 for ' + datatype);
                     result[datatype] = unorderedEvents;
@@ -299,7 +301,7 @@ var eventData = eventData || {};
 
                 // add scored events in the datatype
                 _.each(pivotSortedEvents, function(eventId) {
-                    var eventId = this.getSuffixedEventId(pivotSortedEvents[i], datatype);
+                    var eventId = this.getSuffixedEventId(eventId, datatype);
                     if (utils.isObjInArray(unorderedEvents, eventId)) {
                         orderedEvents.push(eventId);
                     }
@@ -340,7 +342,7 @@ var eventData = eventData || {};
          * Place the datatypes into a preferred ordering for viz
          */
         var getOrderedDatatypes = function(datatypes) {
-            var preferredOrdering = ["clinical data", "expression data", "mutation call", "gistic_copy_number", "kinase target activity", "tf target activity", "expression signature", "mvl drug sensitivity", "datatype label"];
+            var preferredOrdering = ["clinical data", "expression data", "mutation call", "mutation impact score", "gistic_copy_number", "kinase target activity", "tf target activity", "expression signature", "mvl drug sensitivity", "datatype label"];
 
             // expected datatypes
             var list1 = _.filter(preferredOrdering, function(datatype) {
