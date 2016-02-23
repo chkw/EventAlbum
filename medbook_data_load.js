@@ -529,9 +529,9 @@ var medbookDataLoader = medbookDataLoader || {};
             // FD	Frameshift Deletion
             // CS	Complex Substitution
 
-            // handle mutation type
-            if (! _.isUndefined(type)) {
-                type = type.toLowerCase();
+            // handle sequenceOntology
+            if (! _.isUndefined(sequenceOntology)) {
+                sequenceOntology = sequenceOntology.toLowerCase();
                 if (! utils.hasOwnProperty(mutTypeByGene, gene)) {
                     mutTypeByGene[gene] = {};
                 }
@@ -540,9 +540,9 @@ var medbookDataLoader = medbookDataLoader || {};
                     mutTypeByGene[gene][sample] = [];
                 }
 
-                var findResult = _.findWhere(mutTypeByGene[gene][sample], type);
+                var findResult = _.findWhere(mutTypeByGene[gene][sample], sequenceOntology);
                 if (_.isUndefined(findResult)) {
-                    mutTypeByGene[gene][sample].push(type);
+                    mutTypeByGene[gene][sample].push(sequenceOntology);
                 }
             }
             // handle impact score
