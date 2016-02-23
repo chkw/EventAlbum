@@ -202,6 +202,7 @@ var eventData = eventData || {};
                 };
 
             }
+            console.log("pivot dict", this.pivot);
             return this;
         };
 
@@ -219,6 +220,7 @@ var eventData = eventData || {};
                     'scores' : pivotScores
                 };
             }
+            console.log("pivot array", this.pivot);
             return this;
         };
 
@@ -239,7 +241,9 @@ var eventData = eventData || {};
 
                 var key;
                 var val = score;
+                console.log("pEventId", pEventId);
                 pEventId = pEventId.replace(/_mRNA$/, "");
+                pEventId = pEventId.replace(/_mutation$/, "");
                 if (eventId1 === pEventId) {
                     key = eventId2;
                 } else if (eventId2 === pEventId) {
