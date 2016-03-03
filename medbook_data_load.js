@@ -452,6 +452,23 @@ var medbookDataLoader = medbookDataLoader || {};
     };
 
     /**
+     * load sample data for hallmarks-of-cancer mode
+     * The expected sample data is a 2D matrix. cols are samples. rows are features.
+     */
+    mdl.hallmarksSampleData = function(sampleData, OD_eventAlbum) {
+        console.log("hallmarksSampleData");
+
+        var parsedSampleData = d3.tsv.parse(sampleData);
+        _.each(parsedSampleData, function(data) {
+            delete data["Kinases"];
+        });
+
+        var processedSampleData = d3.tsv.format(parsedSampleData);
+
+        mdl.genericMatrixData(processedSampleData, "hallmarks", OD_eventAlbum, "numeric");
+    };
+
+    /**
      *Add expression data from mongo collection.
      * @param {Object} collection
      * @param {Object} OD_eventAlbum
@@ -1016,6 +1033,16 @@ var medbookDataLoader = medbookDataLoader || {};
 
         }
         OD_eventAlbum.setPivotScores_array(null, pivotScores);
+    };
+
+    /**
+     * Set the tested samples for a datatype.
+     * @param {Object} datatype
+     * @param {Object} testedSamples
+     * @param {Object} OD_eventAlbum
+     */
+    mdl.setTestedSamples = function(datatype, testedSamples, OD_eventAlbum) {
+        OD_eventAlbum.setTestedSamples(datatype, testedSamples);
     };
 
 })(medbookDataLoader);

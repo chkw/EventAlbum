@@ -17,6 +17,12 @@ var eventData = eventData || {};
             }
         };
 
+        /**
+         * Specifies the tested sample IDs for a datatype.
+         * Helps to distinguish from untested samples and "none found" data.
+         */
+        this.testedSamples = {};
+
         this.album = {};
 
         /**
@@ -31,6 +37,14 @@ var eventData = eventData || {};
          *
          */
         this.pivot = {};
+
+        this.setTestedSamples = function(datatype, testedSamples) {
+            this.testedSamples[datatype] = testedSamples;
+        };
+
+        this.getTestedSamples = function(datatype) {
+            return (this.testedSamples[datatype]);
+        };
 
         this.getSuffixedEventId = function(name, datatype) {
             var suffix = ( datatype in this.datatypeSuffixMapping) ? this.datatypeSuffixMapping[datatype] : "";
@@ -1007,31 +1021,36 @@ var eventData = eventData || {};
 
             // get all sample IDs for event
             var allEventIdsByCategory = this.getEventIdsByType();
-            for (var i = 0, length = utils.getKeys(allEventIdsByCategory).length; i < length; i++) {
-                var category = utils.getKeys(allEventIdsByCategory)[i];
-                for (var j = 0; j < allEventIdsByCategory[category].length; j++) {
-                    var eventId = allEventIdsByCategory[category][j];
+            _.each(_.keys(allEventIdsByCategory), function(category) {
+                _.each(allEventIdsByCategory[category], function(eventId) {
                     var eventData = this.getEvent(eventId).data;
                     var allEventSampleIds = eventData.getAllSampleIds();
                     if (allAlbumSampleIds.length - allEventSampleIds.length == 0) {
-                        continue;
+                        return;
                     };
 
                     // find missing data
                     var missingSampleIds = utils.keepReplicates(allAlbumSampleIds.concat(allEventSampleIds), 2, true);
                     var missingData = {};
-                    for (var k = 0; k < missingSampleIds.length; k++) {
-                        var id = missingSampleIds[k];
+                    _.each(missingSampleIds, function(id) {
                         if (eventId === "patientSamples") {
                             missingData[id] = "other patient";
+                        // } else if (category === "mutation call") {
+                            // var isTested = _.contains(this.getTestedSamples(category), id);
+                            // if (isTested) {
+                                // missingData[id] = "no call";
+                            // } else {
+                                // missingData[id] = value;
+                            // }
+                            // console.log(isTested, category, id);
                         } else {
                             missingData[id] = value;
                         }
-                    }
+                    }, this);
                     // add data
                     this.getEvent(eventId).data.setData(missingData);
-                }
-            }
+                }, this);
+            }, this);
             return this;
         };
 
@@ -1044,11 +1063,9 @@ var eventData = eventData || {};
 
             var datatypeLabelDatatype = "datatype label";
 
-            for (var i = 0, length = datatypes.length; i < length; i++) {
-                var datatype = datatypes[i];
-
+            _.each(datatypes, function(datatype) {
                 if (datatype === datatypeLabelDatatype) {
-                    continue;
+                    return;
                 }
 
                 var pos_suffix = "(+)";
@@ -1071,7 +1088,7 @@ var eventData = eventData || {};
                     'datatype' : datatypeLabelDatatype,
                     'allowedValues' : null
                 }, {});
-            }
+            }, this);
 
             this.fillInMissingSamples(value);
         };
