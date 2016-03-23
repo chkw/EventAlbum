@@ -40,6 +40,7 @@ var eventData = eventData || {};
 
         this.setTestedSamples = function(datatype, testedSamples) {
             this.testedSamples[datatype] = testedSamples;
+            console.log("testedSamples", this.testedSamples);
         };
 
         this.getTestedSamples = function(datatype) {
@@ -1035,14 +1036,15 @@ var eventData = eventData || {};
                     _.each(missingSampleIds, function(id) {
                         if (eventId === "patientSamples") {
                             missingData[id] = "other patient";
-                        // } else if (category === "mutation call") {
-                            // var isTested = _.contains(this.getTestedSamples(category), id);
-                            // if (isTested) {
-                                // missingData[id] = "no call";
-                            // } else {
-                                // missingData[id] = value;
-                            // }
-                            // console.log(isTested, category, id);
+                        } else if (true && category === "mutation call") {
+                            // set to no call for tested samples without mutation call
+                            var isTested = _.contains(this.getTestedSamples(category), id);
+                            if (isTested) {
+                                missingData[id] = ["no call"];
+                            } else {
+                                missingData[id] = value;
+                            }
+                            console.log(isTested, eventId, category, id, missingData[id]);
                         } else {
                             missingData[id] = value;
                         }
@@ -1324,33 +1326,33 @@ var eventData = eventData || {};
          * compare sample scores and return sorted list of sample IDs. If sortType == numeric, then numeric sort.  Else, sort as strings.
          */
         // TODO dead code?
-        this.sortSamples = function(sampleIdList, sortType) {
-            // sortingData has to be an array
-            var sortingData = this.getData(sampleIdList);
-
-            // sort objects
-            var comparator = compareSamplesAsStrings;
-            if (sortType == null) {
-                sortType = 'categoric';
-            } else {
-                sortType = sortType.toLowerCase();
-            }
-
-            if (((sortType == 'numeric') || (sortType == 'expression'))) {
-                comparator = compareSamplesAsNumeric;
-            } else if (sortType == 'date') {
-                comparator = compareSamplesAsDate;
-            }
-            sortingData.sort(comparator);
-
-            // return row names in sorted order
-            var sortedNames = new Array();
-            for (var k = 0; k < sortingData.length; k++) {
-                sortedNames.push(sortingData[k]['id']);
-            }
-
-            return sortedNames;
-        };
+        // this.sortSamples = function(sampleIdList, sortType) {
+        // // sortingData has to be an array
+        // var sortingData = this.getData(sampleIdList);
+        //
+        // // sort objects
+        // var comparator = compareSamplesAsStrings;
+        // if (sortType == null) {
+        // sortType = 'categoric';
+        // } else {
+        // sortType = sortType.toLowerCase();
+        // }
+        //
+        // if (((sortType == 'numeric') || (sortType == 'expression'))) {
+        // comparator = compareSamplesAsNumeric;
+        // } else if (sortType == 'date') {
+        // comparator = compareSamplesAsDate;
+        // }
+        // sortingData.sort(comparator);
+        //
+        // // return row names in sorted order
+        // var sortedNames = new Array();
+        // for (var k = 0; k < sortingData.length; k++) {
+        // sortedNames.push(sortingData[k]['id']);
+        // }
+        //
+        // return sortedNames;
+        // };
 
         /**
          * Select Ids with data that match a value. Restrict to startingIds, if given.
