@@ -1120,6 +1120,51 @@ var eventData = eventData || {};
                 return samplesToHide;
             }
         };
+
+        /**
+         * Get min/max etc for datatypes.
+         */
+        this.getDatatypeStats = function() {
+            // TODO getDatatypeStats
+            var groupedStats = {};
+
+            var groupedEvents = this.getEventIdsByType();
+
+            _.each(groupedEvents, function(events, datatype) {
+                var datatypeStats = {
+                    "min" : null,
+                    "max" : null
+                };
+                _.each(events, function(eventId, index) {
+                    var eventObj = this.getEvent(eventId);
+                    var stats = eventObj.data.getStats();
+
+                    //  update datatypeStats
+                    stats["min"] = Number(stats["min"]);
+                    if (_.isNumber(stats["min"])) {
+                        if (_.isNull(datatypeStats["min"])) {
+                            datatypeStats["min"] = stats["min"];
+                        }
+                        if (stats["min"] < datatypeStats["min"]) {
+                            datatypeStats["min"] = stats["min"];
+                        }
+                    }
+
+                    stats["max"] = Number(stats["max"]);
+                    if (_.isNumber(stats["max"])) {
+                        if (_.isNull(datatypeStats["max"])) {
+                            datatypeStats["max"] = stats["max"];
+                        }
+                        if (stats["max"] > datatypeStats["max"]) {
+                            datatypeStats["max"] = stats["max"];
+                        }
+                    }
+                }, this);
+                groupedStats[datatype] = datatypeStats;
+            }, this);
+
+            return groupedStats;
+        };
     };
 
     ed.OD_event = function(metadataObj) {
