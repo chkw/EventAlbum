@@ -174,7 +174,7 @@ var eventData = eventData || {};
         this.getEvent = function(eventId) {
             var e = this.album[eventId];
             if ( typeof e === "undefined") {
-                console.log("getEvent got undefined eventObj for: " + eventId);
+                // console.log("getEvent got undefined eventObj for: " + eventId);
             }
             return e;
         };
@@ -518,8 +518,8 @@ var eventData = eventData || {};
                 console.log("multisortSamples got null steps");
                 return sampleIds;
             }
-            console.log("multisortSamples using steps:", sortingSteps.getSteps());
             var steps = sortingSteps.getSteps().slice();
+            console.log("multisortSamples using steps:", steps);
             steps.reverse();
 
             var album = this;
@@ -532,6 +532,7 @@ var eventData = eventData || {};
                     // get this step's values
                     var eventId = steps[i]['name'];
                     if ( typeof eventId === "undefined") {
+                        console.log(eventId, "undefined", "skip this sample sort");
                         continue;
                     }
                     var reverse = steps[i]['reverse'];
@@ -541,7 +542,7 @@ var eventData = eventData || {};
                             var newId = eventId + album.datatypeSuffixMapping[key];
                             eventObj = album.getEvent(newId);
                             if ((eventObj != undefined) && (eventObj != null)) {
-                                // console.log("use " + newId + " for " + eventId);
+                                console.log("use " + newId + " for " + eventId);
                                 eventId = newId;
                                 break;
                             }
@@ -1511,17 +1512,24 @@ var eventData = eventData || {};
         this.addStep = function(name, noReverse) {
             var index = this.getIndex(name);
             if (index >= 0) {
+                // previously saved step
                 var c = this.steps.splice(index, 1)[0];
                 if (!noReverse) {
+                    // reverse the step
                     c["reverse"] = !c["reverse"];
+                } else {
+                    // remove the previously saved step (selected by name only)
+                    this.steps = _.without(this.steps, c);
                 }
                 this.steps.push(c);
             } else {
+                // new step
                 this.steps.push({
                     "name" : name,
                     "reverse" : false
                 });
             }
+            // console.log("steps", _.pluck(this.steps, "name"));
         };
 
         this.removeStep = function(name) {
