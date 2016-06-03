@@ -19,11 +19,21 @@ var bmegDataLoader = bmegDataLoader || {};
      * @param {Object} data
      */
     bdl.addEventBySampleData = function(OD_eventAlbum, feature, suffix, datatype, allowedValues, data) {
+
+        var displayName = null;
+        if (datatype === "drug sensitivity score") {
+            var prefixRe = /^(.*?)\:/i;
+            var suffixRe = /_(.*?)$/i;
+            displayName = feature.replace(prefixRe, "").replace(suffixRe, "");
+        } else {
+            displayName = feature;
+        }
+
         var eventObj = OD_eventAlbum.addEvent({
             'geneSuffix' : suffix,
             'id' : feature + suffix,
             'name' : datatype + ' for ' + feature,
-            'displayName' : feature,
+            'displayName' : displayName,
             'description' : null,
             'datatype' : datatype,
             'allowedValues' : allowedValues
@@ -60,8 +70,6 @@ var bmegDataLoader = bmegDataLoader || {};
 
             // get required metadata
             var eventId = gaeaEventMetadata["eventID"];
-            console.log("processedSampleData", eventId, processedSampleData);
-            console.log("gaeaEventSampleData", eventId, gaeaEventSampleData);
             var datatype = gaeaEventMetadata["eventType"];
             // var datatype = gaeaEventMetadata["datatype"];
             var allowedValues;
@@ -72,11 +80,11 @@ var bmegDataLoader = bmegDataLoader || {};
                     allowedValues = "numeric";
                     suffix = "_mRNA";
                     break;
-                case "signature":
+                case "drug sensitivity score":
                     // scored classifier
-                    // allowedValues = "numeric";
+                    allowedValues = "numeric";
                     // binary classifier
-                    allowedValues = "categoric";
+                    // allowedValues = "categoric";
                     suffix = "";
                     break;
                 case "clinical":
@@ -88,8 +96,6 @@ var bmegDataLoader = bmegDataLoader || {};
                     allowedValues = "categoric";
                     suffix = "";
             }
-
-            eventId = eventId + suffix;
 
             var eventObj = OD_eventAlbum.getEvent(eventId);
 
