@@ -9,6 +9,15 @@ var bmegDataLoader = bmegDataLoader || {};
 
 (function(bdl) {"use strict";
 
+    bdl.displayNameGenerator = {
+        "drug sensitivity score" : function(name) {
+            var prefixRe = /^(.*?)\:/i;
+            var suffixRe = /_median$/i;
+            var displayName = name.replace(prefixRe, "").replace(suffixRe, "");
+            return displayName;
+        }
+    };
+
     /**
      * Convenience method to a new eventObj to the eventAlbum.
      * @param {Object} OD_eventAlbum
@@ -21,10 +30,8 @@ var bmegDataLoader = bmegDataLoader || {};
     bdl.addEventBySampleData = function(OD_eventAlbum, feature, suffix, datatype, allowedValues, data) {
 
         var displayName = null;
-        if (datatype === "drug sensitivity score") {
-            var prefixRe = /^(.*?)\:/i;
-            var suffixRe = /_(.*?)$/i;
-            displayName = feature.replace(prefixRe, "").replace(suffixRe, "");
+        if (_.contains(_.keys(bdl.displayNameGenerator), datatype)) {
+            displayName = bdl.displayNameGenerator[datatype](feature);
         } else {
             displayName = feature;
         }
