@@ -77,6 +77,9 @@ var bmegDataLoader = bmegDataLoader || {};
             _.each(gaeaEventSampleData, function(dataObj) {
                 var sampleID = dataObj.sampleID;
                 var value = dataObj.value;
+                if (_.isUndefined(value) || _.isNull(value) || value === "") {
+                    value = "no value";
+                }
                 processedSampleData[sampleID] = value;
             });
 
