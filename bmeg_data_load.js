@@ -73,18 +73,6 @@ var bmegDataLoader = bmegDataLoader || {};
             var gaeaEventMetadata = gaeaEventData.metadata;
             var gaeaEventSampleData = gaeaEventData.sampleData;
 
-            var processedSampleData = {};
-            _.each(gaeaEventSampleData, function(dataObj) {
-                var sampleID = dataObj.sampleID;
-                var value = dataObj.value;
-                if (_.isUndefined(value) || _.isNull(value) || value === "") {
-                    value = "no value";
-                }
-                processedSampleData[sampleID] = value;
-            });
-
-            console.log("processedSampleData samples", _.keys(processedSampleData).length);
-
             // get required metadata
             var eventId = gaeaEventMetadata.eventID;
             var datatype = gaeaEventMetadata.eventType;
@@ -111,7 +99,7 @@ var bmegDataLoader = bmegDataLoader || {};
                     allowedValues = "categoric";
                     suffix = "";
                     break;
-                case "mutation_call":
+                case "mutation call":
                     datatype = "mutation call";
                     allowedValues = "mutation type";
                     suffix = "_mutation";
@@ -120,6 +108,29 @@ var bmegDataLoader = bmegDataLoader || {};
                     allowedValues = "categoric";
                     suffix = "";
             }
+
+            // collect the data
+            var processedSampleData = {};
+            _.each(gaeaEventSampleData, function(dataObj) {
+                var sampleID = dataObj.sampleID;
+                var value = null;
+
+                switch (datatype) {
+                    case "mutation call":
+                        value = dataObj.value.toLowerCase().split(/,/);
+                        console.log("value", value);
+                        break;
+                    default:
+                        value = dataObj.value;
+                }
+
+                if (_.isUndefined(value) || _.isNull(value) || value === "") {
+                    value = "no value";
+                }
+                processedSampleData[sampleID] = value;
+            });
+
+            console.log("processedSampleData samples", _.keys(processedSampleData).length);
 
             var eventObj = OD_eventAlbum.getEvent(eventId);
 
